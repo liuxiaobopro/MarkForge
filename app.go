@@ -38,6 +38,27 @@ func NewApp() *App {
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
+	
+	args := os.Args[1:]
+	if len(args) > 0 {
+		path := args[0]
+		if path != "" {
+			info, err := os.Stat(path)
+			if err == nil {
+				if info.IsDir() {
+					runtime.EventsEmit(a.ctx, "open-path", map[string]interface{}{
+						"path": path,
+						"type": "folder",
+					})
+				} else if filepath.Ext(path) == ".md" {
+					runtime.EventsEmit(a.ctx, "open-path", map[string]interface{}{
+						"path": path,
+						"type": "file",
+					})
+				}
+			}
+		}
+	}
 }
 
 func (a *App) ReadFile(path string) (string, error) {
@@ -46,6 +67,10 @@ func (a *App) ReadFile(path string) (string, error) {
 		return "", err
 	}
 	return string(data), nil
+}
+
+func (a *App) WriteFile(path string, content string) error {
+	return os.WriteFile(path, []byte(content), 0644)
 }
 
 func (a *App) ListDir(dirPath string) ([]*FileNode, error) {

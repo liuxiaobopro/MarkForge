@@ -33,3 +33,7 @@ export function ReadFile(arg1) {
 export function SaveCache(arg1) {
   return window['go']['main']['App']['SaveCache'](arg1);
 }
+
+export function WriteFile(arg1, arg2) {
+  return window['go']['main']['App']['WriteFile'](arg1, arg2);
+}

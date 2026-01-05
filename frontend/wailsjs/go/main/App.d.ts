@@ -17,3 +17,5 @@ export function OpenFolderDialog():Promise<string>;
 export function ReadFile(arg1:string):Promise<string>;
 
 export function SaveCache(arg1:main.CacheData):Promise<void>;
+
+export function WriteFile(arg1:string,arg2:string):Promise<void>;

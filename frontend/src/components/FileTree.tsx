@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ReadFile, ListDir } from "@wails/go/main/App";
 import { main } from "@wails/go/models";
 
@@ -12,13 +12,13 @@ interface FileTreeProps {
 export function FileTree({ rootPath, onFileSelect }: FileTreeProps) {
   const [expanded, setExpanded] = useState<Set<string>>(new Set());
   const [selected, setSelected] = useState<string>("");
-  const [childrenCache, setChildrenCache] = useState<Map<string, FileNode[]>>(
-    new Map()
-  );
+  const childrenCacheRef = useRef<Map<string, FileNode[]>>(new Map());
+  const [rootNodes, setRootNodes] = useState<FileNode[]>([]);
+  const prevRootPathRef = useRef<string>("");
 
   const loadDir = async (path: string): Promise<FileNode[]> => {
-    if (childrenCache.has(path)) {
-      return childrenCache.get(path)!;
+    if (childrenCacheRef.current.has(path)) {
+      return childrenCacheRef.current.get(path)!;
     }
     try {
       const items = await ListDir(path);
@@ -30,7 +30,7 @@ export function FileTree({ rootPath, onFileSelect }: FileTreeProps) {
         if (!a.isDir && b.isDir) return 1;
         return a.name.localeCompare(b.name);
       });
-      setChildrenCache((prev) => new Map(prev).set(path, sorted));
+      childrenCacheRef.current.set(path, sorted);
       return sorted;
     } catch (error) {
       console.error("Failed to load directory:", error);
@@ -63,24 +63,27 @@ export function FileTree({ rootPath, onFileSelect }: FileTreeProps) {
   };
 
   const TreeNode = ({ node, level }: { node: FileNode; level: number }) => {
-    const [children, setChildren] = useState<FileNode[]>([]);
+    const [children, setChildren] = useState<FileNode[]>(() => {
+      if (node.isDir && expanded.has(node.path)) {
+        const cached = childrenCacheRef.current.get(node.path);
+        return cached || [];
+      }
+      return [];
+    });
     const isExpanded = expanded.has(node.path);
     const isSelected = selected === node.path;
     const isMarkdown = !node.isDir && node.path.endsWith(".md");
 
     useEffect(() => {
       if (node.isDir && isExpanded) {
-        loadDir(node.path).then((items) => {
-          const filtered = items.filter(
-            (item) => item.isDir || item.path.endsWith(".md")
-          );
-          const sorted = filtered.sort((a, b) => {
-            if (a.isDir && !b.isDir) return -1;
-            if (!a.isDir && b.isDir) return 1;
-            return a.name.localeCompare(b.name);
-          });
-          setChildren(sorted);
-        });
+        const cached = childrenCacheRef.current.get(node.path);
+        if (cached) {
+          setChildren(cached);
+        } else {
+          loadDir(node.path).then(setChildren);
+        }
+      } else if (!isExpanded) {
+        setChildren([]);
       }
     }, [node.path, isExpanded]);
 
@@ -109,22 +112,17 @@ export function FileTree({ rootPath, onFileSelect }: FileTreeProps) {
     );
   };
 
-  const [rootNodes, setRootNodes] = useState<FileNode[]>([]);
-
   useEffect(() => {
-    if (rootPath) {
-      setChildrenCache(new Map());
-      loadDir(rootPath).then((items) => {
-        const filtered = items.filter(
-          (item) => item.isDir || item.path.endsWith(".md")
-        );
-        const sorted = filtered.sort((a, b) => {
-          if (a.isDir && !b.isDir) return -1;
-          if (!a.isDir && b.isDir) return 1;
-          return a.name.localeCompare(b.name);
+    if (rootPath && rootPath !== prevRootPathRef.current) {
+      prevRootPathRef.current = rootPath;
+      const cached = childrenCacheRef.current.get(rootPath);
+      if (cached) {
+        setRootNodes(cached);
+      } else {
+        loadDir(rootPath).then((items) => {
+          setRootNodes(items);
         });
-        setRootNodes(sorted);
-      });
+      }
     }
   }, [rootPath]);
 
