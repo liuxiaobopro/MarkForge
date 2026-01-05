@@ -1,28 +1,34 @@
-import {useState} from 'react';
-import logo from './assets/images/logo-universal.png';
-import './App.css';
-import {Greet} from "../wailsjs/go/main/App";
+import { useState } from "react";
+import "./App.css";
+import { FileSelector } from "@/components/FileSelector";
+import { MarkdownViewer } from "@/components/MarkdownViewer";
 
 function App() {
-    const [resultText, setResultText] = useState("Please enter your name below 👇");
-    const [name, setName] = useState('');
-    const updateName = (e: any) => setName(e.target.value);
-    const updateResultText = (result: string) => setResultText(result);
+  const [content, setContent] = useState("");
 
-    function greet() {
-        Greet(name).then(updateResultText);
-    }
+  const handleFileSelect = async (file: File) => {
+    const text = await file.text();
+    setContent(text);
+  };
 
-    return (
-        <div id="App">
-            <img src={logo} id="logo" alt="logo"/>
-            <div id="result" className="result">{resultText}</div>
-            <div id="input" className="input-box">
-                <input id="name" className="input" onChange={updateName} autoComplete="off" name="input" type="text"/>
-                <button className="btn" onClick={greet}>Greet</button>
-            </div>
-        </div>
-    )
+  return (
+    <div id="App">
+      <header className="app-header">
+        <h1>MarkForge</h1>
+        <FileSelector onFileSelect={handleFileSelect} />
+      </header>
+      <main className="app-main">
+        {content ? (
+          <MarkdownViewer content={content} />
+        ) : (
+          <div className="empty-state">
+            <p>请选择一个 Markdown 文件开始浏览</p>
+          </div>
+        )}
+      </main>
+    </div>
+  );
 }
 
-export default App
+export default App;
+

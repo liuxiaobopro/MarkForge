@@ -1,59 +1,157 @@
-#app {
-    height: 100vh;
-    text-align: center;
+#App {
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	background: #ffffff;
+	color: #1a1a1a;
 }
 
-#logo {
-    display: block;
-    width: 50%;
-    height: 50%;
-    margin: auto;
-    padding: 10% 0 0;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: 100% 100%;
-    background-origin: content-box;
+.app-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1rem 2rem;
+	border-bottom: 1px solid #e5e5e5;
+	background: #fafafa;
 }
 
-.result {
-    height: 20px;
-    line-height: 20px;
-    margin: 1.5rem auto;
+.app-header h1 {
+	margin: 0;
+	font-size: 1.5rem;
+	font-weight: 600;
 }
 
-.input-box .btn {
-    width: 60px;
-    height: 30px;
-    line-height: 30px;
-    border-radius: 3px;
-    border: none;
-    margin: 0 0 0 20px;
-    padding: 0 8px;
-    cursor: pointer;
+.open-btn {
+	padding: 0.5rem 1rem;
+	background: #2563eb;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 0.875rem;
+	transition: background 0.2s;
 }
 
-.input-box .btn:hover {
-    background-image: linear-gradient(to top, #cfd9df 0%, #e2ebf0 100%);
-    color: #333333;
+.open-btn:hover {
+	background: #1d4ed8;
 }
 
-.input-box .input {
-    border: none;
-    border-radius: 3px;
-    outline: none;
-    height: 30px;
-    line-height: 30px;
-    padding: 0 10px;
-    background-color: rgba(240, 240, 240, 1);
-    -webkit-font-smoothing: antialiased;
+.app-main {
+	flex: 1;
+	overflow: auto;
+	padding: 2rem;
 }
 
-.input-box .input:hover {
-    border: none;
-    background-color: rgba(255, 255, 255, 1);
+.empty-state {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100%;
+	color: #6b7280;
 }
 
-.input-box .input:focus {
-    border: none;
-    background-color: rgba(255, 255, 255, 1);
+.markdown-viewer {
+	max-width: 800px;
+	margin: 0 auto;
+	line-height: 1.7;
+}
+
+.markdown-viewer h1,
+.markdown-viewer h2,
+.markdown-viewer h3,
+.markdown-viewer h4,
+.markdown-viewer h5,
+.markdown-viewer h6 {
+	margin-top: 1.5em;
+	margin-bottom: 0.5em;
+	font-weight: 600;
+}
+
+.markdown-viewer h1 {
+	font-size: 2em;
+	border-bottom: 1px solid #e5e5e5;
+	padding-bottom: 0.3em;
+}
+
+.markdown-viewer h2 {
+	font-size: 1.5em;
+	border-bottom: 1px solid #e5e5e5;
+	padding-bottom: 0.3em;
+}
+
+.markdown-viewer p {
+	margin-bottom: 1em;
+}
+
+.markdown-viewer code {
+	background: #f4f4f5;
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 0.9em;
+	font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.markdown-viewer pre {
+	background: #1e1e1e;
+	padding: 1em;
+	border-radius: 6px;
+	overflow-x: auto;
+	margin-bottom: 1em;
+}
+
+.markdown-viewer pre code {
+	background: transparent;
+	padding: 0;
+	color: #d4d4d4;
+}
+
+.markdown-viewer blockquote {
+	border-left: 4px solid #e5e5e5;
+	padding-left: 1em;
+	margin: 1em 0;
+	color: #6b7280;
+}
+
+.markdown-viewer ul,
+.markdown-viewer ol {
+	margin-bottom: 1em;
+	padding-left: 2em;
+}
+
+.markdown-viewer li {
+	margin-bottom: 0.5em;
+}
+
+.markdown-viewer table {
+	border-collapse: collapse;
+	width: 100%;
+	margin-bottom: 1em;
+}
+
+.markdown-viewer th,
+.markdown-viewer td {
+	border: 1px solid #e5e5e5;
+	padding: 0.5em;
+	text-align: left;
+}
+
+.markdown-viewer th {
+	background: #f9fafb;
+	font-weight: 600;
+}
+
+.markdown-viewer a {
+	color: #2563eb;
+	text-decoration: none;
+}
+
+.markdown-viewer a:hover {
+	text-decoration: underline;
+}
+
+.markdown-viewer img {
+	max-width: 100%;
+	height: auto;
+	border-radius: 4px;
+	margin: 1em 0;
 }
