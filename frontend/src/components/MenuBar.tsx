@@ -8,6 +8,7 @@ interface HistoryItem {
 }
 
 type ViewMode = "preview" | "split";
+type ThemeMode = "light" | "dark" | "system";
 
 interface MenuBarProps {
   onOpenFile: () => void;
@@ -16,6 +17,8 @@ interface MenuBarProps {
   onHistorySelect: (item: HistoryItem) => void;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
+  themeMode: ThemeMode;
+  onThemeChange: (mode: ThemeMode) => void;
 }
 
 export function MenuBar({
@@ -25,9 +28,12 @@ export function MenuBar({
   onHistorySelect,
   viewMode,
   onViewModeChange,
+  themeMode,
+  onThemeChange,
 }: MenuBarProps) {
   const [showHistory, setShowHistory] = useState(false);
   const [showViewMode, setShowViewMode] = useState(false);
+  const [showTheme, setShowTheme] = useState(false);
 
   return (
     <div className="menu-bar">
@@ -113,6 +119,66 @@ export function MenuBar({
                   {viewMode === "split" ? "✓" : ""}
                 </span>
                 左右分屏
+              </div>
+            </div>
+          )}
+        </div>
+        <div
+          className="menu-item"
+          onMouseEnter={() => setShowTheme(true)}
+          onMouseLeave={() => setShowTheme(false)}
+        >
+          主题
+          {showTheme && (
+            <div
+              className="menu-dropdown"
+              onMouseEnter={() => setShowTheme(true)}
+              onMouseLeave={() => setShowTheme(false)}
+            >
+              <div
+                className={`menu-dropdown-item ${
+                  themeMode === "light" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onThemeChange("light");
+                  setShowTheme(false);
+                }}
+              >
+                <span className="menu-check">
+                  {themeMode === "light" ? "✓" : ""}
+                </span>
+                明亮
+              </div>
+              <div
+                className={`menu-dropdown-item ${
+                  themeMode === "dark" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onThemeChange("dark");
+                  setShowTheme(false);
+                }}
+              >
+                <span className="menu-check">
+                  {themeMode === "dark" ? "✓" : ""}
+                </span>
+                黑暗
+              </div>
+              <div
+                className={`menu-dropdown-item ${
+                  themeMode === "system" ? "active" : ""
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onThemeChange("system");
+                  setShowTheme(false);
+                }}
+              >
+                <span className="menu-check">
+                  {themeMode === "system" ? "✓" : ""}
+                </span>
+                跟随系统
               </div>
             </div>
           )}

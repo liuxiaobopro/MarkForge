@@ -19,6 +19,13 @@ import {
 } from "@wails/go/main/App";
 import { main } from "@wails/go/models";
 import { EventsOn } from "../wailsjs/runtime/runtime";
+import {
+  WindowSetLightTheme,
+  WindowSetDarkTheme,
+  WindowSetSystemDefaultTheme,
+} from "../wailsjs/runtime/runtime";
+
+type ThemeMode = "light" | "dark" | "system";
 
 function App() {
   const [content, setContent] = useState("");
@@ -30,6 +37,10 @@ function App() {
   const [activeTab, setActiveTab] = useState("current");
   const [viewMode, setViewMode] = useState<"preview" | "split">("preview");
   const [editContent, setEditContent] = useState("");
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
+    const saved = localStorage.getItem("themeMode");
+    return (saved as ThemeMode) || "system";
+  });
   const saveTimeoutRef = useRef<NodeJS.Timeout>();
   const markdownViewerRef = useRef<HTMLDivElement>(null);
   const markdownEditorRef = useRef<HTMLDivElement>(null);
@@ -37,9 +48,55 @@ function App() {
   const isScrollingRef = useRef(false);
   const sidebarWidth = 300;
 
+  const applyTheme = (mode: ThemeMode) => {
+    const root = document.documentElement;
+    let isDark = false;
+
+    if (mode === "system") {
+      isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+      WindowSetSystemDefaultTheme();
+    } else if (mode === "dark") {
+      isDark = true;
+      WindowSetDarkTheme();
+    } else {
+      isDark = false;
+      WindowSetLightTheme();
+    }
+
+    if (isDark) {
+      root.setAttribute("data-theme", "dark");
+    } else {
+      root.setAttribute("data-theme", "light");
+    }
+  };
+
   useEffect(() => {
     loadCache();
+    applyTheme(themeMode);
+    
+    const handleContextMenu = (e: MouseEvent) => {
+      e.preventDefault();
+    };
+    
+    document.addEventListener("contextmenu", handleContextMenu);
+    return () => {
+      document.removeEventListener("contextmenu", handleContextMenu);
+    };
   }, []);
+
+  useEffect(() => {
+    localStorage.setItem("themeMode", themeMode);
+    applyTheme(themeMode);
+  }, [themeMode]);
+
+  useEffect(() => {
+    if (themeMode === "system") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+      const handleChange = () => applyTheme("system");
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+  }, [themeMode]);
 
   useEffect(() => {
     const handleOpenPath = (data: any) => {
@@ -282,6 +339,8 @@ function App() {
         onHistorySelect={handleHistorySelect}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
+        themeMode={themeMode}
+        onThemeChange={setThemeMode}
       />
       <div className="app-layout">
         <aside className="app-sidebar" style={{ width: `${sidebarWidth}px` }}>
